@@ -11,14 +11,35 @@ exports.amendTimeStamp = (data) => {
   return amendedInfo;
 };
 
-exports.ammendCommentsFormat = (data, keyToChange, newKey) => {
-  const amendedInfo = data.map(({ ...info }) => {
-    console.log("FUCK");
-  });
-  return amendedInfo;
+exports.createRefObject = (arr, refKey, refValue) => {
+  const refObject = {};
 
-  //remove belongs to
-  //amend timestamp
-  // change created by to author
-  // has an article id
+  arr.forEach((element) => {
+    const refKeys = element[refKey];
+    const refVal = element[refValue];
+
+    refObject[refKeys] = refVal;
+  });
+
+  return refObject;
+};
+
+exports.reformatData = (
+  arr,
+  keyToChangeOne,
+  newKeyOne,
+  keyToChangeTwo,
+  newKeyTwo,
+  refObjPair
+) => {
+  //console.log(arr);
+  const reformattedArr = arr.map(({ ...obj }) => {
+    obj[newKeyOne] = obj[keyToChangeOne];
+    obj[newKeyTwo] = refObjPair[obj[keyToChangeTwo]];
+    delete obj[keyToChangeOne];
+    delete obj[keyToChangeTwo];
+    return obj;
+  });
+
+  return reformattedArr;
 };

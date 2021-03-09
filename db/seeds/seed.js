@@ -4,7 +4,12 @@ const {
   commentsData,
   usersData,
 } = require("../data/index");
-const { amendTimeStamp } = require("../utils/data-manipulation");
+
+const {
+  amendTimeStamp,
+  reformatData,
+  createRefObject,
+} = require("../utils/data-manipulation");
 
 exports.seed = function (knex) {
   return knex.migrate
@@ -22,7 +27,25 @@ exports.seed = function (knex) {
       const correctedTimeStamp = amendTimeStamp(articlesData);
       return knex("articles").insert(correctedTimeStamp).returning("*");
     })
-    .then(() => {
-      console.log(commentsData);
+    .then((articles) => {
+      //console.log(articles);
+      const articlesRefObject = createRefObject(
+        articles,
+        "title",
+        "article_id"
+      );
+      //console.log(articlesRefObject);
+      const correctedTimeStamp = amendTimeStamp(commentsData);
+
+      const reformattedComments = reformatData(
+        correctedTimeStamp,
+        "created_by",
+        "author",
+        "belongs_to",
+        "article_id",
+        articlesRefObject
+      );
+
+      return knex("comments").insert(reformattedComments);
     });
 };
