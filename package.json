@@ -10,7 +10,8 @@
     "migrate-make": "knex migrate:make",
     "migrate-latest": "knex migrate:latest",
     "migrate-rollback": "knex migrate:rollback",
-    "view": "psql -f ./view.sql > output.txt"
+    "view": "psql -f ./view.sql > output.txt",
+    "test-app": "jest app.test.js"
   },
   "repository": {
     "type": "git",
@@ -24,8 +25,10 @@
   },
   "homepage": "https://github.com/northcoders/be-nc-news#readme",
   "devDependencies": {
+    "express": "^4.17.1",
     "jest": "^26.6.3",
     "knex": "^0.95.1",
-    "pg": "^8.5.1"
+    "pg": "^8.5.1",
+    "supertest": "^6.1.3"
   }
 }

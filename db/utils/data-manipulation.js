@@ -1,6 +1,4 @@
 // extract any functions you are using to manipulate your data, into this file
-const data = require("../data/development-data/articles");
-const commentsInfo = require("../data/development-data/comments");
 
 exports.amendTimeStamp = (data) => {
   const amendedInfo = data.map(({ ...info }) => {
@@ -13,14 +11,11 @@ exports.amendTimeStamp = (data) => {
 
 exports.createRefObject = (arr, refKey, refValue) => {
   const refObject = {};
-
   arr.forEach((element) => {
     const refKeys = element[refKey];
     const refVal = element[refValue];
-
     refObject[refKeys] = refVal;
   });
-
   return refObject;
 };
 
@@ -32,7 +27,6 @@ exports.reformatData = (
   newKeyTwo,
   refObjPair
 ) => {
-  //console.log(arr);
   const reformattedArr = arr.map(({ ...obj }) => {
     obj[newKeyOne] = obj[keyToChangeOne];
     obj[newKeyTwo] = refObjPair[obj[keyToChangeTwo]];
@@ -40,6 +34,5 @@ exports.reformatData = (
     delete obj[keyToChangeTwo];
     return obj;
   });
-
   return reformattedArr;
 };

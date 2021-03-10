@@ -1,4 +1,4 @@
-You are now connected to database "nc_news" as user "danieljohnsaleh".
+You are now connected to database "nc_news" as user "abenaesha".
    slug   |               description               
 ----------+-----------------------------------------
  coding   | Code is love, code is life
