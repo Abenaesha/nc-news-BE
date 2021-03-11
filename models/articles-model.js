@@ -23,7 +23,7 @@ exports.fetchArticleById = (article_id) => {
       if (article) {
         return article;
       } else {
-          return Promise.reject({status: 404, msg: 'This article does not exist. Please try different article Id!'})
+          return Promise.reject({status: 404, msg: `Article ${article_id} does not exist. Please try different article Id!`})
       }
  })
 }
@@ -51,22 +51,56 @@ exports.patchArticleById = (article_id, inc_votes) => {
     })
 }
 
-exports.postComments = (article_id, {username, body}) => {
-  const author = username;
+exports.postCommentByArticleId = (article_id, { username, body }) => {
+
+  const newComment = {
+    body: body,
+    article_id: article_id,
+    author: username,
+    votes: 0,
+    created_at: new Date()
+  };
   return dbConnection('comments')
-    .insert(article_id, author, body)
+    .insert(newComment)
     .returning('*')
     .then(([comment]) => {
-      console.log(comment)
-      return comment
+      return comment;
   })
 }
 
-/*
-exports.insertNewComment = (article_id, { username, body }) => {
-  const author = username;
-  return connection("comments")
-    .insert({ article_id, author, body })
-    .returning("*");
-};
-*/
+exports.fetchCommentsByArticleId = (article_id, sorted_by = 'created_at', order = 'desc') => {
+  return dbConnection
+    .select('*')
+    .from('comments')
+    .where('article_id', article_id)
+    .orderBy(sorted_by, order)
+    .returning('*')
+    .then(comments => {
+      if (comments.length === 0) {
+        return Promise.reject({ status: 404, msg: `There are no comments for article ${article_id} yet. Be the first to add your comments!` })
+      }
+      else {
+        return comments;
+      };
+    });
+}
+
+exports.fetchArticles = (sort_by = 'created_at', order = 'asc', author, topic) => {
+  return dbConnection
+    .select('articles.*')
+    .from('articles')
+    .count('comments.comment_id', { as: 'comment_count' })
+    .leftJoin('comments', 'comments.article_id', 'articles.article_id')
+    .modify((query) => {
+      if (author) {
+        query.where("articles.author", author);
+      } else if (topic) {
+        query.where("articles.topic", topic);
+      }
+    })
+    .groupBy('articles.article_id')
+    .orderBy(sort_by, order)
+    .then((articles) => {
+      return articles;
+    });
+}

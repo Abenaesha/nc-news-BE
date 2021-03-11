@@ -11,7 +11,11 @@
     "migrate-latest": "knex migrate:latest",
     "migrate-rollback": "knex migrate:rollback",
     "view": "psql -f ./view.sql > output.txt",
-    "test-app": "jest app.test.js"
+    "test-app": "jest app.test.js",
+    "migrate-reset": "npm run migrate-rollback && npm run migrate-latest && npm run seed"
+  },
+  "jest": {
+    "setupFilesAfterEnv": ["jest-sorted"]
   },
   "repository": {
     "type": "git",
@@ -27,6 +31,7 @@
   "devDependencies": {
     "express": "^4.17.1",
     "jest": "^26.6.3",
+    "jest-sorted": "^1.0.11",
     "knex": "^0.95.1",
     "pg": "^8.5.1",
     "supertest": "^6.1.3"

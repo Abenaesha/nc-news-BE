@@ -11,6 +11,10 @@ exports.handle400s = (err, req, res, next) => {
   } else next(err);
 }
 
+exports.handleInvalidPath = (req, res, next) => {
+  res.status(404).send({ msg: 'The path you are trying to reach not found' });
+}
+
 exports.handleCustomErrors = (err, req, res, next) => {
   err ?
       res.status(err.status).send({ msg: err.msg })

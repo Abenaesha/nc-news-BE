@@ -130,29 +130,152 @@ describe('/api', () => {
         .get('/api/articles/3333')
         .expect(404)
         .then(({ body: { msg } }) => {
-        expect(msg).toBe('This article does not exist. Please try different article Id!')
+        expect(msg).toBe('Article 3333 does not exist. Please try different article Id!')
       })
     });
   });
-  describe('POST - /articles/:article_id/comments', () => {
+  describe('POST - GET /articles/:article_id/comments', () => {
     it('201: POST - responds with 201 for successful request with new comment', () => {
+      const input = { username: 'rogersop', body: 'NEW - Do not forget to commit regularly!' };
+      const expected = {
+        comment_id: 19,
+        body: 'NEW - Do not forget to commit regularly!',
+        article_id: 5,
+        author: 'rogersop',
+        votes: 0,
+        created_at: expect.any(String),
+      };
       return request(app)
-        .post('/api/articles/10/comments')
-        .send({
-          username: 'xXx',
-          body: 'NEW - Do not forget to commit regularly!'
-        })
+        .post('/api/articles/5/comments')
+        .send(input)
         .expect(201)
-        .then(({ body: { comment } }) => {
-          console.log(comment)
-          //19
-          expect(comment).toEqual({
-            comment_id: 19,
-            body: 'NEW - Do not forget to commit regularly!',
-            article_id: 10,
-            author: 'rogersop',
-            votes: 50,
-            created_at: new Date(1615420163389),
+        .then(({ body: {comment} }) => {
+          expect(comment).toMatchObject(expected);
+        });
+    });
+    it('200: GET - responds with an array of comments for a given article Id', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toHaveLength(13)
+          expect(comments[3]).toEqual({
+            comment_id: 5,
+            author: 'icellusedkars',
+            article_id: 1,
+            votes: 0,
+            created_at: '2013-11-23T12:36:03.389Z',
+            body: 'I hate streaming noses'
+          });
+        })
+    });
+    it('200: GET - returns comments in order of created_at by default', () => {
+      return request(app)
+        .get('/api/articles/9/comments')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toBeSortedBy('created_at', {
+            descending: true,
+          });
+        });
+    });
+    it('200: GET - returns comments sorted by column specified by user', () => {
+      return request(app)
+        .get('/api/articles/9/comments?sort_by=votes')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toBeSortedBy('votes');
+        });
+    });
+    xit('200: GET - returns comments in ascending order', () => {
+      return request(app)
+        .get('/api/articles/9/comments?order=asc')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toBeSortedBy('created_at', {
+            ascending: true,
+          });
+        });
+    });
+    it('200: GET - returns comments sorted by order and column specified by user', () => {
+      return request(app)
+        .get('/api/articles/9/comments?sort_by=votes&order=asc')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toBeSortedBy('votes', {
+            ascending: true,
+          });
+        });
+    });
+    it('404: GET - returns a 404 and message if an article has no comments', () => {
+      return request(app)
+        .get('/api/articles/4/comments')
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe(
+            `There are no comments for article 4 yet. Be the first to add your comments!`
+          );
+        });
+    });
+  });
+  describe('GET - POST - /articles', () => {
+    it('200: GET - returns an array of articles', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          //console.log(articles)
+          expect(articles).toHaveLength(12);
+          expect(articles).toEqual(expect.any(Array));
+          articles.forEach(article => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                body: expect.any(String),
+                votes: expect.any(Number),
+                topic: expect.any(String),
+                author: expect.any(String),
+                created_at: expect.any(String),
+                comment_count: expect.any(String)
+              })
+            );
+          });
+        });
+    });
+    it('404: responds with 404 when inputting invalid path request', () => {
+      return request(app)
+        .get('/api/articlez')
+        .expect(404)
+        .then(({ body: { msg } }) => {
+        expect(msg).toBe('The path you are trying to reach not found')
+      })
+    });
+    it('200: GET - sort_by queries default to created_at', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy('created_at');
+        });
+    });
+    it('200: GET - order queries defaults to descending unless specified', () => {
+      return request(app)
+        .get('/api/articles?sorted_by=votes&order=desc')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy('votes')
+      })
+    });
+    it('200: filters the results of articles by author', () => {
+      return request(app)
+        .get('/api/articles?topic=mitch&author=butter_bridge')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          //expect(articles).toHaveLength(1);
+          articles.forEach((article) => {
+            expect(article.topic).toBe('mitch');
+            expect(article.author).toBe('butter_bridge');
           });
         });
     });
@@ -176,5 +299,4 @@ return request(app)
                 comment_count: '13'
               })
             })
-
 */
