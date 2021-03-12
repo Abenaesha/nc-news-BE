@@ -1,14 +1,14 @@
 const dbConnection = require('../db/dbConnection');
 
 exports.deleteArticleById = (article_id) => {
-  // return dbConnection('articles')
-  //   .where({'article_id', article_id})
-  //   .del()
-  //   .then(delCount => {
-  //     if (!delCount) {
-  //       return Promise.reject({ status: 404, msg: 'This article NOT found!'}) 
-  //     }
-  // })
+  return dbConnection('articles')
+    .where({ article_id })
+    .del()
+    .then(deleteCount => {
+      if (!deleteCount) {
+        return Promise.reject({ status: 404, msg: 'This article NOT found!'}) 
+      }
+  })
 }
 
 exports.fetchArticleById = (article_id) => {

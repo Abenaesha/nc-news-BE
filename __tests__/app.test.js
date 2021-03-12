@@ -64,10 +64,28 @@ describe('/api', () => {
     });
   });
   describe('DELETE - /articles/:article_id', () => {
-    xit('204: DELETE - responds with 204 for successful remove of an article by ID', () => {
+    it('204: DELETE - responds with 204 for successful remove of an article by ID', () => {
       return request(app)
         .delete('/api/articles/1')
         .expect(204)
+    });
+    describe('ERROR Handling', () => {
+      it('404: DELETE - article id not found', () => {
+        return request(app)
+          .delete('/api/articles/111')
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe('This article NOT found!');
+          });
+      });
+      it('400: DELETE - invalid article id', () => {
+        return request(app)
+          .delete('/api/articles/Hi')
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe('The ID you inputted is INVALID!');
+          });
+      });
     });
   });
   describe('PATCH - /articles/:articles.article_id', () => {
@@ -122,7 +140,7 @@ describe('/api', () => {
         .get('/api/articles/starLink')
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe('The article ID you inputted is INVALID!')
+          expect(msg).toBe('The ID you inputted is INVALID!')
         })
     });
     it('404: GET - responds with 404 for article id that does not exist yet', () => {
@@ -225,7 +243,7 @@ describe('/api', () => {
       .get('/api/articles/pigeon/comments')
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe('The article ID you inputted is INVALID!');
+        expect(msg).toBe('The ID you inputted is INVALID!');
       });
   });
   xit('405: DELETE - method not allowed', () => {
@@ -298,18 +316,18 @@ describe('/api', () => {
             expect(articles).toBeSortedBy('votes')
           })
       });
-    });
-    it('200: filters the results of articles by author', () => {
-      return request(app)
-        .get('/api/articles?topic=cats&author=rogersop')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).toHaveLength(1);
-          articles.forEach((article) => {
-            expect(article.topic).toBe('cats');
-            expect(article.author).toBe('rogersop');
-          })
-        });
+      it('200: filters the results of articles by author', () => {
+        return request(app)
+          .get('/api/articles?topic=cats&author=rogersop')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toHaveLength(1);
+            articles.forEach((article) => {
+              expect(article.topic).toBe('cats');
+              expect(article.author).toBe('rogersop');
+            })
+          });
+      });
     });
     it('404: responds with 404 when inputting invalid path request', () => {
       return request(app)
@@ -442,6 +460,31 @@ describe('/api', () => {
                 'Could not update. Please check the spelling of the key fields!'
               );
             });
+        });
+      });
+    });
+    describe('DELETE - /comments/comment_id', () => {
+      it('204: DELETE - responds with 204 for successful delete of a comment by its id', () => {
+        return request(app)
+          .delete('/api/comments/4')
+          .expect(204)
+      });
+      describe('DELETE - ERROR Handling', () => {
+        it('404: DELETE - valid but comment id does not exists', () => {
+          return request(app)
+            .delete('/api/comments/400')
+            .expect(404)
+            .then(({ body: { msg } }) => {
+            expect(msg).toBe('No comments found!')
+          })
+        });
+        it('404: DELETE - invalid comment id', () => {
+          return request(app)
+            .delete('/api/comments/cats')
+            .expect(400)
+            .then(({ body: { msg } }) => {
+            expect(msg).toBe('The ID you inputted is INVALID!')
+          })
         });
       });
     });

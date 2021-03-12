@@ -4,8 +4,8 @@ exports.up = function (knex) {
     articleTable.string("title").notNullable();
     articleTable.text("body").notNullable();
     articleTable.integer("votes").defaultTo(0);
-    articleTable.string("topic").references("topics.slug");
-    articleTable.string("author").references("users.username");
+    articleTable.string("topic").references("topics.slug").onDelete('CASCADE')
+    articleTable.string("author").references("users.username").onDelete('CASCADE')
     articleTable.timestamp("created_at");
   });
 };

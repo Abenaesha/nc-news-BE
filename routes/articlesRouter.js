@@ -13,7 +13,7 @@ articlesRouter
   .route('/:article_id')
   .get(getArticleById)
   .patch(updateArticleById)
-  //.delete(removeArticleById)
+  .delete(removeArticleById)
 
 articlesRouter
   .route('/:article_id/comments')

@@ -8,7 +8,7 @@ exports.handle405s = (req, res, next) => {
 exports.handle400s = (err, req, res, next) => {
   if (err.code === '22P02') {
     res.status(400).send({
-      msg: 'The article ID you inputted is INVALID!'
+      msg: 'The ID you inputted is INVALID!'
     });
   } else next(err);
 }

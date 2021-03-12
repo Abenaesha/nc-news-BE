@@ -1,4 +1,4 @@
-const { fetchCommentById, patchCommentById } = require('../models/comments-model');
+const { fetchCommentById, patchCommentById, deleteCommentsById } = require('../models/comments-model');
 
 exports.updateCommentById = (req, res, next) => {
   const { comment_id } = req.params;
@@ -20,4 +20,12 @@ exports.updateCommentById = (req, res, next) => {
     })
   })
     .catch(err => next(err));
+};
+
+exports.removeCommentById = (req, res, next) => {
+  const { comment_id } = req.params;
+  deleteCommentsById(comment_id).then(() => {
+    res.status(204).send();
+  })
+    .catch(err => (next(err)));
 }

@@ -1,10 +1,11 @@
 //const articles = require('../db/data/test-data/articles');
 const { fetchArticleById, deleteArticleById, patchArticleById, postCommentByArticleId, fetchCommentsByArticleId, fetchArticles, checkIfArticleExists, postArticle } = require('../models/articles-model');
 exports.removeArticleById = (req, res, next) => {
-  // const { article_id } = req.params;
-  // deleteArticleById(article_id).then(() => {
-  //   res.statusSend(204);
-  // })
+  const { article_id } = req.params;
+  deleteArticleById(article_id).then(() => {
+    res.status(204).send();
+  })
+    .catch(err => next(err));
 }
 
 exports.getArticleById = (req, res, next) => {
