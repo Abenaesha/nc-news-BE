@@ -34,7 +34,7 @@ exports.patchArticleById = (article_id, inc_votes) => {
     .increment('votes', inc_votes)
     .returning('*')
     .then(([article]) => {
-      if (article.length === 0) {
+      if (!article.length === 0) {
         return Promise.reject({
           status: 404,
           msg:
@@ -49,6 +49,17 @@ exports.patchArticleById = (article_id, inc_votes) => {
         return article;
       }
     })
+}
+
+exports.checkIfArticleExists = (article_id) => {
+  return dbConnection('articles')
+    .select('*')
+    .where({ article_id })
+    .then((article) => {
+      if (article.length === 0) {
+        return Promise.reject({ status: 404, msg: `There is no article ${article_id} yet!` });
+      };
+    });
 }
 
 exports.postCommentByArticleId = (article_id, { username, body }) => {
@@ -68,39 +79,57 @@ exports.postCommentByArticleId = (article_id, { username, body }) => {
   })
 }
 
-exports.fetchCommentsByArticleId = (article_id, sorted_by = 'created_at', order = 'desc') => {
+exports.fetchCommentsByArticleId = (article_id, sort_by , order) => {
   return dbConnection
     .select('*')
     .from('comments')
-    .where('article_id', article_id)
-    .orderBy(sorted_by, order)
+    .where({article_id})
+    .orderBy(sort_by || 'created_at', order || 'desc')
     .returning('*')
-    .then(comments => {
-      if (comments.length === 0) {
-        return Promise.reject({ status: 404, msg: `There are no comments for article ${article_id} yet. Be the first to add your comments!` })
-      }
-      else {
-        return comments;
-      };
-    });
+    // .then(comments => {
+    //   if (!comments.length) {
+    //     return Promise.reject({ status: 404, msg: `There are no comments for article ${article_id} yet. Be the first to add your comments!` })
+    //   }
+    //   else {
+    //     return comments;
+    //   };
+    // });
 }
 
-exports.fetchArticles = (sort_by = 'created_at', order = 'asc', author, topic) => {
+exports.fetchArticles = (sort_by, order, author, topic) => {
   return dbConnection
     .select('articles.*')
     .from('articles')
     .count('comments.comment_id', { as: 'comment_count' })
     .leftJoin('comments', 'comments.article_id', 'articles.article_id')
+    .groupBy('articles.article_id')
+    .orderBy(sort_by || 'created_at', order || 'desc')
     .modify((query) => {
       if (author) {
-        query.where("articles.author", author);
-      } else if (topic) {
-        query.where("articles.topic", topic);
+        query.where('articles.author', author);
+      }
+      if (topic) {
+        query.where('articles.topic', topic);
       }
     })
-    .groupBy('articles.article_id')
-    .orderBy(sort_by, order)
+    .returning('*')
     .then((articles) => {
-      return articles;
-    });
+      if (articles.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "No articles found",
+        })
+      } else {
+        return articles;
+      }
+    })
+}
+
+exports.postArticle = (article) => {
+  return dbConnection('articles')
+    .insert(article)
+    .returning('*')
+    .then(([article]) => {
+      return article;
+  })
 }

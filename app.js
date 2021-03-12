@@ -1,6 +1,6 @@
 const express = require('express');
 const apiRouter = require('./routes/apiRouter');
-const { handleCustomErrors, handle400s, handleInvalidPath } = require('./errors/errors');
+const { handleCustomErrors, handle400s, handleInvalidPath, handle405s } = require('./errors/errors');
 
 const app = express();
 app.use(express.json())

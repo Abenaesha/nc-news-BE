@@ -37,7 +37,7 @@ describe('/api', () => {
         })
         .expect(405)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe('Method Not Allowed!')
+          expect(msg).toBe('Method not allowed!')
         })
     });
   });
@@ -59,15 +59,15 @@ describe('/api', () => {
         .get('/api/users/xXx')
         .expect(404)
         .then(({ body: { msg } }) => {
-        expect(msg).toBe('This user NOT found, TRY AGAIN!')
-      })
+          expect(msg).toBe('This user NOT found, TRY AGAIN!')
+        })
     });
   });
   describe('DELETE - /articles/:article_id', () => {
     xit('204: DELETE - responds with 204 for successful remove of an article by ID', () => {
       return request(app)
         .delete('/api/articles/1')
-      .expect(204)
+        .expect(204)
     });
   });
   describe('PATCH - /articles/:articles.article_id', () => {
@@ -95,8 +95,8 @@ describe('/api', () => {
         .send({ in_v: 20 })
         .expect(404)
         .then(({ body: { msg } }) => {
-        expect(msg).toBe('ERROR: could not update. Please check the spelling of the key fields!')
-      })
+          expect(msg).toBe('ERROR: could not update. Please check the spelling of the key fields!')
+        })
     });
   });
   describe('GET - /articles/:article_id', () => {
@@ -115,26 +115,26 @@ describe('/api', () => {
             votes: expect.any(Number),
             comment_count: expect.any(String),
           });
-      })
+        })
     });
     it('400: GET - responds with 400 for invalid article Id request', () => {
       return request(app)
         .get('/api/articles/starLink')
         .expect(400)
         .then(({ body: { msg } }) => {
-        expect(msg).toBe('The article ID you inputted is INVALID!')
-      })
+          expect(msg).toBe('The article ID you inputted is INVALID!')
+        })
     });
     it('404: GET - responds with 404 for article id that does not exist yet', () => {
       return request(app)
         .get('/api/articles/3333')
         .expect(404)
         .then(({ body: { msg } }) => {
-        expect(msg).toBe('Article 3333 does not exist. Please try different article Id!')
-      })
+          expect(msg).toBe('Article 3333 does not exist. Please try different article Id!')
+        })
     });
   });
-  describe('POST - GET /articles/:article_id/comments', () => {
+  describe('POST - /articles/:article_id/comments', () => {
     it('201: POST - responds with 201 for successful request with new comment', () => {
       const input = { username: 'rogersop', body: 'NEW - Do not forget to commit regularly!' };
       const expected = {
@@ -149,10 +149,12 @@ describe('/api', () => {
         .post('/api/articles/5/comments')
         .send(input)
         .expect(201)
-        .then(({ body: {comment} }) => {
+        .then(({ body: { comment } }) => {
           expect(comment).toMatchObject(expected);
         });
     });
+  });
+  describe('GET - /articles/:article_id/comments', () => {
     it('200: GET - responds with an array of comments for a given article Id', () => {
       return request(app)
         .get('/api/articles/1/comments')
@@ -169,62 +171,96 @@ describe('/api', () => {
           });
         })
     });
-    it('200: GET - returns comments in order of created_at by default', () => {
+    it('200: GET - article_id has no comments', () => {
       return request(app)
-        .get('/api/articles/9/comments')
+        .get('/api/articles/2/comments')
         .expect(200)
         .then(({ body: { comments } }) => {
-          expect(comments).toBeSortedBy('created_at', {
-            descending: true,
+          expect(comments).toHaveLength(0);
+        });
+    });
+    describe('GET - Queries', () => {
+      it('200: GET - returns comments in order of created_at by default', () => {
+        return request(app)
+          .get('/api/articles/9/comments')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).toBeSortedBy('created_at', {
+              descending: true,
+            });
           });
-        });
-    });
-    it('200: GET - returns comments sorted by column specified by user', () => {
-      return request(app)
-        .get('/api/articles/9/comments?sort_by=votes')
-        .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments).toBeSortedBy('votes');
-        });
-    });
-    xit('200: GET - returns comments in ascending order', () => {
-      return request(app)
-        .get('/api/articles/9/comments?order=asc')
-        .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments).toBeSortedBy('created_at', {
-            ascending: true,
+      });
+      it('200: GET - returns comments sorted by column specified by user', () => {
+        return request(app)
+          .get('/api/articles/9/comments?sort_by=votes')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).toBeSortedBy('votes', {
+              descending: true,
+            });
           });
-        });
-    });
-    it('200: GET - returns comments sorted by order and column specified by user', () => {
-      return request(app)
-        .get('/api/articles/9/comments?sort_by=votes&order=asc')
-        .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments).toBeSortedBy('votes', {
-            ascending: true,
+      });
+      it('200: GET - returns comments in ascending order', () => {
+        return request(app)
+          .get('/api/articles/9/comments?order=asc')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).toBeSortedBy('created_at');
           });
-        });
-    });
-    it('404: GET - returns a 404 and message if an article has no comments', () => {
-      return request(app)
-        .get('/api/articles/4/comments')
-        .expect(404)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe(
-            `There are no comments for article 4 yet. Be the first to add your comments!`
-          );
-        });
+      });
+      it('200: GET - returns comments sorted by order and column specified by user', () => {
+        return request(app)
+          .get('/api/articles/9/comments?sort_by=votes&order=asc')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).toBeSortedBy('votes');
+          });
+      });
     });
   });
-  describe('GET - POST - /articles', () => {
+    
+    
+  it('400: GET - responds with 400 and message of Invalid article_id type', () => {
+    return request(app)
+      .get('/api/articles/pigeon/comments')
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe('The article ID you inputted is INVALID!');
+      });
+  });
+  xit('405: DELETE - method not allowed', () => {
+    return request(app)
+      .delete('/api/articles/1/comments')
+      .expect(405)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe('Method not allowed!');
+      });
+  });
+  // not working having conflict with below test!
+  xit('404: GET - returns a 404 and message if an article has no comments', () => {
+    return request(app)
+      .get('/api/articles/4/comments')
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe(
+          `There are no comments for article 4 yet. Be the first to add your comments!`
+        );
+      });
+  });
+  it('404: GET - responds with 404 and msg for none existing article', () => {
+    return request(app)
+      .get('/api/articles/20/comments')
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe('There is no article 20 yet!')
+      })
+  });
+  describe('GET - /articles', () => {
     it('200: GET - returns an array of articles', () => {
       return request(app)
         .get('/api/articles')
         .expect(200)
         .then(({ body: { articles } }) => {
-          //console.log(articles)
           expect(articles).toHaveLength(12);
           expect(articles).toEqual(expect.any(Array));
           articles.forEach(article => {
@@ -243,60 +279,171 @@ describe('/api', () => {
           });
         });
     });
+    describe('Queries', () => {
+      it('200: GET - sort_by queries default to created_at', () => {
+        return request(app)
+          .get('/api/articles')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toBeSortedBy('created_at', {
+              descending: true,
+            });
+          });
+      });
+      it('200: GET - order queries defaults to descending unless specified', () => {
+        return request(app)
+          .get('/api/articles?sorted_by=votes&order=asc')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toBeSortedBy('votes')
+          })
+      });
+    });
+    it('200: filters the results of articles by author', () => {
+      return request(app)
+        .get('/api/articles?topic=cats&author=rogersop')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toHaveLength(1);
+          articles.forEach((article) => {
+            expect(article.topic).toBe('cats');
+            expect(article.author).toBe('rogersop');
+          })
+        });
+    });
     it('404: responds with 404 when inputting invalid path request', () => {
       return request(app)
         .get('/api/articlez')
         .expect(404)
         .then(({ body: { msg } }) => {
-        expect(msg).toBe('The path you are trying to reach not found')
-      })
+          expect(msg).toBe('The path you are trying to reach not found')
+        })
     });
-    it('200: GET - sort_by queries default to created_at', () => {
+    xit('Status 400: Sort by invalid column name', () => {
       return request(app)
-        .get('/api/articles')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).toBeSortedBy('created_at');
+        .get('/api/articles/1/comments?sort_by=pigeon')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid type');
         });
     });
-    it('200: GET - order queries defaults to descending unless specified', () => {
-      return request(app)
-        .get('/api/articles?sorted_by=votes&order=desc')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).toBeSortedBy('votes')
-      })
+    describe('POST - /articles', () => {
+      it('201: POST - responds with 201 for successful request with a new article', () => {
+        const input = {
+          title: "Video of cat singing",
+          body: "Here's a great vid of a cat belting out some tunes",
+          votes: 0,
+          topic: "cats",
+          author: "rogersop",
+          created_at: new Date(),
+        };
+        const expected = {
+          article_id: 13,
+          title: "Video of cat singing",
+          body: "Here's a great vid of a cat belting out some tunes",
+          votes: 0,
+          topic: "cats",
+          author: "rogersop",
+          created_at: expect.any(String),
+        }
+        return request(app)
+          .post('/api/articles')
+          .send(input)
+          .expect(201)
+          .then(({ body: { article } }) => {
+            expect(article).toEqual(expected);
+          })
+      });
+      xdescribe('POST - ERROR Handling', () => {
+        it('400: POST responds with status 400 for post request with incorrect keys', () => {
+          const input = {
+            title: "Video of cat singing",
+            body: "Here's a great vid of a cat belting out some tunes",
+            votez: 0,
+            topic: "cats",
+            aothur: "rogersop",
+            created_at: new Date(),
+          };
+          return request(app)
+            .post('/api/articles')
+            .send(input)
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              console.log(body)
+            expect(msg).toBe('Your request rejected! check for invalid properties')
+          })
+        });
+      });
     });
-    it('200: filters the results of articles by author', () => {
-      return request(app)
-        .get('/api/articles?topic=mitch&author=butter_bridge')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          //expect(articles).toHaveLength(1);
-          articles.forEach((article) => {
-            expect(article.topic).toBe('mitch');
-            expect(article.author).toBe('butter_bridge');
+  });
+  describe('/comments', () => {
+    describe('PATCH - /comments/:comments_id', () => {
+      it('200: PATCH - returns an object of updated comment by incrementing the current votes for valid comment Id', () => {
+        const input = { inc_votes: 55 };
+        const expected = {
+          comment_id: 5,
+          body: 'I hate streaming noses',
+          author: 'icellusedkars',
+          article_id: 1,
+          votes: 55,
+          created_at: expect.any(String)
+        }
+        return request(app)
+          .patch('/api/comments/5')
+          .send(input)
+          .expect(200)
+          .then(({ body: { comment } }) => {
+            expect(comment).toHaveProperty('votes')
+            expect(comment).toHaveProperty('author')
+            expect(comment).toHaveProperty('article_id')
+            expect(comment).toEqual(expected)
           });
+      });
+      it('200: PATCH - returns an object of updated comment by decrementing the current votes for valid comment Id', () => {
+        const input = { inc_votes: -55 };
+        const expected = {
+          comment_id: 10,
+          body: 'git push origin master',
+          author: 'icellusedkars',
+          article_id: 1,
+          votes: -55,
+          created_at: expect.any(String)
+        }
+        return request(app)
+          .patch('/api/comments/10')
+          .send(input)
+          .expect(200)
+          .then(({ body: { comment } }) => {
+            expect(comment).toHaveProperty('votes')
+            expect(comment).toHaveProperty('author')
+            expect(comment).toHaveProperty('article_id')
+            expect(comment).toEqual(expected)
+          });
+      });
+      describe('PATCH - ERROR Handling', () => {
+        it('404: PATCH responds with 404 status when given invalid key', () => {
+          return request(app)
+            .patch('/api/comments/20')
+            .send({ include_votes: 1 })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe(
+                'Sorry - the comment you have asked to update does not exist!'
+              );
+            });
         });
+        it('404: PATCH responds with 404 status when given invalid key', () => {
+          return request(app)
+            .patch('/api/comments/1')
+            .send({ include_votes: 1 })
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe(
+                'Could not update. Please check the spelling of the key fields!'
+              );
+            });
+        });
+      });
     });
   });
 });
-
-/*
-return request(app)
-          .get('/api/articles/1')
-          .expect(200)
-          .then(({body:{article}}) => {
-              expect(article.comment_count).toBe('13')
-              expect(article).toEqual({
-                article_id: 1,
-                title: 'Living in the shadow of a great man',
-                body: 'I find this existence challenging',
-                votes: 100,
-                topic: 'mitch',
-                author: 'butter_bridge',
-                created_at: '2018-11-15T12:21:54.171Z',
-                comment_count: '13'
-              })
-            })
-*/

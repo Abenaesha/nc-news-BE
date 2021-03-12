@@ -1,6 +1,8 @@
+//NEED TO RE-DO MY ERRORS!!!!!!!!!!
+
 //regular error function
 exports.handle405s = (req, res, next) => {
-    res.status(405).send({ msg: 'Method Not Allowed!' });
+    res.status(405).send({ msg: 'Method not allowed!' });
 }
 
 exports.handle400s = (err, req, res, next) => {

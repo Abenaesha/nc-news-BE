@@ -1,12 +1,12 @@
-const express = require('express');
 const articlesRouter = require('express').Router();
 const {
   getArticleById,
   removeArticleById,
   updateArticleById,
-  addCommentByArticleId,
+  addNewCommentByArticleId,
   getCommentsByArticleId,
-  getArticles
+  getArticles,
+  addNewArticle
 } = require('../controllers/articles-controller');
 
 articlesRouter
@@ -17,11 +17,12 @@ articlesRouter
 
 articlesRouter
   .route('/:article_id/comments')
-  .post(addCommentByArticleId)
+  .post(addNewCommentByArticleId)
   .get(getCommentsByArticleId)
 
 articlesRouter
   .route('/')
   .get(getArticles)
+  .post(addNewArticle)
 
 module.exports = articlesRouter;
