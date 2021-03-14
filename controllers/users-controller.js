@@ -9,7 +9,5 @@ exports.getUsersByUsername = (req, res, next) => {
             res.status(200).send({ user });
         }
     })
-        .catch(err => {
-            next(err);
-        });
+        .catch(err => next(err));
 }

@@ -207,7 +207,7 @@ describe("reformatData", () => {
       "article_id",
       refObj
     );
-    //console.log(input);
+    // (input);
     expect(input).toEqual([
       {
         body:

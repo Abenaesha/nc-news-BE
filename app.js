@@ -6,7 +6,8 @@ const app = express();
 app.use(express.json())
 
 app.use('/api', apiRouter);
-app.all('/*', handleInvalidPath);
+app.all('/*', handle405s);
+//app.use(handleInvalidPath);
 app.use(handle400s);
 app.use(handleCustomErrors);
 

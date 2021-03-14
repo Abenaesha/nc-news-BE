@@ -7,6 +7,5 @@ exports.up = function (knex) {
 
 exports.down = function (knex) {
   return knex.schema.dropTable("topics").then(() => {
-    //console.log("topics table dropped!");
   });
 };

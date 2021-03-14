@@ -1,26 +1,18 @@
-//NEED TO RE-DO MY ERRORS!!!!!!!!!!
-
-//regular error function
-exports.handle405s = (req, res, next) => {
-    res.status(405).send({ msg: 'Method not allowed!' });
-}
-
 exports.handle400s = (err, req, res, next) => {
-  if (err.code === '22P02') {
+  if (err.code === '22P02' || err.code === '42703') {
     res.status(400).send({
-      msg: 'The ID you inputted is INVALID!'
+      msg: 'Bad Request!'
     });
   } else next(err);
-}
-
-exports.handleInvalidPath = (req, res, next) => {
-  res.status(404).send({ msg: 'The path you are trying to reach not found' });
-}
+};
 
 exports.handleCustomErrors = (err, req, res, next) => {
   err ?
-      res.status(err.status).send({ msg: err.msg })
-      :
-      next(err);
-}
-  
+    res.status(err.status).send({ msg: err.msg })
+    :
+    next(err);
+};
+
+exports.handle405s = (req, res, next) => {
+  res.status(405).send({ msg: 'Method not allowed!' });
+};

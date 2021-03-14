@@ -15,7 +15,7 @@ module.exports = [
     avatar_url: 'https://avatars2.githubusercontent.com/u/24394918?s=400&v=4',
   },
   {
-    username: 'lurker',
+    username: 'lurkerLOL',
     name: 'do_nothing',
     avatar_url:
       'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',

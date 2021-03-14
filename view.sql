@@ -7,4 +7,4 @@
 -- LEFT JOIN comments ON articles.article_id = comments.article_id
 -- GROUP BY articles.article_id;
 SELECT * FROM articles;
-SELECT * FROM comments;
+-- SELECT * FROM comments;
