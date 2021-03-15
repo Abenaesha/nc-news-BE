@@ -1,4 +1,20 @@
-const { fetchUsersByUsername } = require('../models/users-model');
+const {
+    fetchUsersByUsername, fetchUsers, postUser,
+} = require('../models/users-model');
+
+exports.getUsers = (req, res, next) => {
+    fetchUsers().then(users => {
+        res.status(200).send({ users })
+    })
+        .catch(err => next(err))
+}
+
+exports.addNewUser = (req, res, next) => {
+    postUser(req.body).then(([newUser]) => {
+        res.status(201).send({ newUser })
+    })
+        .catch(err => next(err))
+}
 
 exports.getUsersByUsername = (req, res, next) => {
     const { username } = req.params;

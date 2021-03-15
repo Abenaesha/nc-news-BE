@@ -6,37 +6,95 @@ const dbConnection = require('../db/dbConnection');
 beforeEach(() => dbConnection.seed.run())
 afterAll(() => dbConnection.destroy());
 
-describe('/api', () => {
-  describe('/topics', () => {
-    it('200: GET - returns an array of topic objects', () => {
+describe('ALL endPoints - /api', () => {
+  describe("/api", () => {
+    it.only('200: GET - responds with JSON object with all the available routes', () => {
       return request(app)
-        .get('/api/topics')
+        .get('/api')
         .expect(200)
-        .then(({ body: { topics } }) => {
-          expect(Array.isArray(topics)).toBe(true);
-          expect(topics).toHaveLength(3)
-          topics.forEach(topic => {
-            expect(topic).toEqual(
-              expect.objectContaining(
-                {
-                  slug: expect.any(String),
-                  description: expect.any(String)
-                }
+        .then(({ body }) => {
+          expect(body)
+        });
+    });
+  });
+  describe('/topics', () => {
+    describe('GET - /topics', () => {
+      it('200: GET - returns an array of topic objects', () => {
+        return request(app)
+          .get('/api/topics')
+          .expect(200)
+          .then(({ body: { topics } }) => {
+            expect(Array.isArray(topics)).toBe(true);
+            expect(topics).toHaveLength(3)
+            topics.forEach(topic => {
+              expect(topic).toEqual(
+                expect.objectContaining(
+                  {
+                    slug: expect.any(String),
+                    description: expect.any(String)
+                  }
+                )
               )
-            )
+            })
+                      
           })
-                    
-        })
+      });
+    });
+    describe('POST - /topics', () => {
+      it('201: responds with 201 for a successful post topic request', () => {
+        const input = {
+          slug: 'Parrots',
+          description: 'They talk a lot!'
+        }
+        return request(app)
+          .post('/api/topics')
+          .send(input)
+          .expect(201)
+          .then(({ body: { newTopic } }) => {
+            expect(newTopic).toMatchObject({
+              slug: 'Parrots',
+              description: 'They talk a lot!'
+            })
+          })
+      });
     });
     describe('ERROR HAndling', () => {
+      xit('400: non-existing topics path', () => {
+        return request(app)
+          .get('/api/toopics')
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe('not found!')
+          })
+      });
+      it('400: POST - invalid key', () => {
+        const input = {
+          slugs: 'dogs',
+          description: 'Not penguin!'
+        }
+        return request(app)
+          .post('/api/topics')
+          .send(input)
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe('Bad Request!')
+          })
+      });
+      it('400: POST - existing topic', () => {
+        const input = {
+          slug: 'paperLOL',
+          description: 'what books are made of'
+        }
+        return request(app)
+          .post('/api/topics')
+          .send(input)
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe('Bad Request!')
+          })
+      });
       it('405: responds with status 405 for invalid methods', () => {
-        // return request(app)
-        //   .post('/api/topics')
-        //   .send({
-        //     slug: "testing for not allowed method",
-        //     description: "testing for not allowed method",
-        //   })
-        const notAllowedMethods = ['post', 'patch', 'put', 'delete'];
+        const notAllowedMethods = ['patch', 'put', 'delete'];
         const methodPromises = notAllowedMethods.map(method => {
           return request(app)
           [method]('/api/topics')
@@ -45,31 +103,85 @@ describe('/api', () => {
               expect(msg).toBe('Method not allowed!')
             })
         });
-        //revise
         return Promise.all(methodPromises);
       });
     });
-
   });
-  describe('GET - /users/:username', () => {
-    it('200: GET - return a successful request for username with the correct user details', () => {
-      return request(app)
-        .get('/api/users/lurkerLOL')
-        .expect(200)
-        .then(({ body: { user } }) => {
-          expect(user).toMatchObject({
-            username: expect.any(String),
-            avatar_url: expect.any(String),
-            name: expect.any(String)
-          });
-        });
+  describe('/users', () => {
+    describe('GET - /users', () => {
+      it('200: responds with users details', () => {
+        return request(app)
+          .get('/api/users')
+          .expect(200)
+          .then(({ body: { users } }) => {
+            expect(Array.isArray(users)).toEqual(true)
+            users.forEach(user => {
+              expect(user).toEqual(
+                expect.objectContaining({
+                  username: expect.any(String),
+                  avatar_url: expect.any(String),
+                  name: expect.any(String)
+                })
+              )
+            })
+        })
+      });
+    });
+    describe('POST - /users', () => {
+      it('201: responds with 201 for a successful post user request', () => {
+        const input = {
+          username: "MrBee",
+          avatar_url: "http://clipart-library.com/img1/775402.png",
+          name: "Bee",
+        };
+        return request(app)
+          .post('/api/users')
+          .send(input)
+          .expect(201)
+          .then(({ body: { newUser } }) => {
+            expect(newUser).toMatchObject({
+              username: "MrBee",
+              avatar_url: "http://clipart-library.com/img1/775402.png",
+              name: "Bee",
+            })
+        })
+      });
     });
     describe('ERROR Handling', () => {
+      it('400: invalid keys', () => {
+        const input = {
+          username: "MrBee",
+          avatar_urls: "http://clipart-library.com/img1/775402.png",
+          namez: "Bee",
+        };
+        return request(app)
+          .post('/api/users')
+          .send(input)
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toEqual('Bad Request!')
+        })
+      });
+      it('400: user already exists', () => {
+        const input =   {
+          username: 'lurkerLOL',
+          name: 'do_nothing',
+          avatar_url:
+            'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+        };
+        return request(app)
+          .post('/api/users')
+          .send(input)
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toEqual('Bad Request!')
+        })
+      });
       it('405: invalid methods', () => {
-        const notAllowedMethods = ['post', 'patch', 'put', 'delete'];
+        const notAllowedMethods = ['patch', 'put', 'delete'];
         const methodPromises = notAllowedMethods.map(method => {
           return request(app)
-          [method]('/api/users/lurker')
+          [method]('/api/users')
             .expect(405)
             .then(({ body: { msg } }) => {
               expect(msg).toBe('Method not allowed!')
@@ -77,13 +189,41 @@ describe('/api', () => {
         });
         return Promise.all(methodPromises);
       });
-      it('404: GET - responds with 404 if user does not exist', () => {
+    });
+    describe('GET - /users/:username', () => {
+      it('200: GET - return a successful request for username with the correct user details', () => {
         return request(app)
-          .get('/api/users/xXx')
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).toBe('This user NOT found, TRY AGAIN!')
-          })
+          .get('/api/users/lurkerLOL')
+          .expect(200)
+          .then(({ body: { user } }) => {
+            expect(user).toMatchObject({
+              username: expect.any(String),
+              avatar_url: expect.any(String),
+              name: expect.any(String)
+            });
+          });
+      });
+      describe('ERROR Handling', () => {
+        it('405: invalid methods', () => {
+          const notAllowedMethods = ['post', 'patch', 'put', 'delete'];
+          const methodPromises = notAllowedMethods.map(method => {
+            return request(app)
+            [method]('/api/users/lurkerLOL')
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).toBe('Method not allowed!')
+              })
+          });
+          return Promise.all(methodPromises);
+        });
+        it('404: GET - responds with 404 if user does not exist', () => {
+          return request(app)
+            .get('/api/users/xXx')
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe('This user NOT found, TRY AGAIN!')
+            })
+        });
       });
     });
   });
@@ -421,7 +561,7 @@ describe('/api', () => {
               .send({ in_v: 20 })
               .expect(400)
               .then(({ body: { msg } }) => {
-                expect(msg).toBe('Could not update. Please check the spelling of the key fields!')
+                expect(msg).toBe('Could not update. Check the spelling of the key fields!')
               })
           });
           it('400: PATCH - Bad request with with invalid inc_votes value', () => {
