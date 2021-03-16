@@ -1,27 +1,17 @@
 {
-  "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
-  },
-  "GET /api/topics": {
-    "description": "serves an array of all topics",
-    "queries": [],
-    "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
-    }
-  },
-  "GET /api/articles": {
-    "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
-    "exampleResponse": {
-      "articles": [
-        {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": 1527695953341
-        }
-      ]
-    }
-  }
+  "GET /api/topics":"selects all topics",
+  "POST /api/topics": "adds a topic to topics database",
+  "GET /api/users": "selects all users",
+  "POST /api/users": "adds a user to users database",
+  "GET /api/users/:username":"selects a user by its username",
+  "GET /api/articles":"selects all articles / query available",
+  "POST /api/articles":"adds an article to articles database ",
+  "GET /api/articles/:article_id":"selects article by its id",
+  "PATCH /api/articles/:article_id":"updates the votes of article by its id",
+  "DELETE /api/articles/:article_id":"removes article by its id",
+  "GET /api/articles/:article_id/comments":"selects  comments by article id /query available",
+  "POST /api/articles/:article_id/comments":"adds a comment to an article by its id",
+  "DELETE /api/articles/:article_id/comments":"removes a comment from an article by its id",
+  "PATCH /api/comments/:comment_id":"updates the vote count of a comment by id",
+  "DELETE /api/comments/:comment_id":"removes a comment by id"
 }

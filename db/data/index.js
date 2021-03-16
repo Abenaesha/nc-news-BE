@@ -6,6 +6,7 @@ const devData = require("./development-data/index");
 const dataObj = {
   test: testData,
   development: devData,
+  production: devData,
 };
 
 module.exports = dataObj[ENV];

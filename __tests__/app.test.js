@@ -8,12 +8,12 @@ afterAll(() => dbConnection.destroy());
 
 describe('ALL endPoints - /api', () => {
   describe("/api", () => {
-    it.only('200: GET - responds with JSON object with all the available routes', () => {
+    it('200: GET - responds with JSON object with all the available routes', () => {
       return request(app)
         .get('/api')
         .expect(200)
         .then(({ body }) => {
-          expect(body)
+          expect(Object.keys(body))
         });
     });
   });
@@ -58,15 +58,6 @@ describe('ALL endPoints - /api', () => {
           })
       });
     });
-    describe('ERROR HAndling', () => {
-      xit('400: non-existing topics path', () => {
-        return request(app)
-          .get('/api/toopics')
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).toBe('not found!')
-          })
-      });
       it('400: POST - invalid key', () => {
         const input = {
           slugs: 'dogs',
@@ -93,18 +84,17 @@ describe('ALL endPoints - /api', () => {
             expect(msg).toBe('Bad Request!')
           })
       });
-      it('405: responds with status 405 for invalid methods', () => {
-        const notAllowedMethods = ['patch', 'put', 'delete'];
-        const methodPromises = notAllowedMethods.map(method => {
-          return request(app)
-          [method]('/api/topics')
-            .expect(405)
-            .then(({ body: { msg } }) => {
-              expect(msg).toBe('Method not allowed!')
-            })
-        });
-        return Promise.all(methodPromises);
+    it('405: responds with status 405 for invalid methods', () => {
+      const notAllowedMethods = ['patch', 'put', 'delete'];
+      const methodPromises = notAllowedMethods.map(method => {
+        return request(app)
+        [method]('/api/topics')
+          .expect(405)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe('Method not allowed!')
+          })
       });
+      return Promise.all(methodPromises);
     });
   });
   describe('/users', () => {
@@ -714,17 +704,6 @@ describe('ALL endPoints - /api', () => {
               expect(msg).toBe('Method not allowed!');
             });
         });
-        xit('404: GET - returns a 404 and message if an article has no comments', () => {
-          return request(app)
-            .get('/api/articles/4/comments')
-            .expect(404)
-            .then(({ body: { msg } }) => {
-
-              expect(msg).toBe(
-                'Article ID 4 has no comments!'
-              );
-            });
-        });
         it('404: GET - responds with 404 and msg for none existing article', () => {
           return request(app)
             .get('/api/articles/20/comments')
@@ -784,24 +763,14 @@ describe('ALL endPoints - /api', () => {
       });
       describe('ERROR Handling', () => {
         it('400: responds with 400 for invalid article ID', () => {
-          const input = { body: 'Sunday Refactor!', username: 'butter_bridge'}
+          const input = { body: 'Sunday Refactor!', username: 'butter_bridge' }
           return request(app)
             .post('/api/articles/XXX/comments')
             .send(input)
             .expect(400)
             .then(({ body: { msg } }) => {
-            expect(msg).toBe('Article ID XXX is invalid!')
-          })
-        });
-        xit('404: responds with 404 for valid but non-existing article ID', () => {
-          const input = { body: 'Sunday Refactor!', username: 'butter_bridge'}
-          return request(app)
-            .post('/api/articles/99/comments')
-            .send(input)
-            .expect(404)
-            .then(({ body: { msg } }) => {
-            expect(msg).toBe('Article ID XXX is invalid!')
-          })
+              expect(msg).toBe('Article ID XXX is invalid!')
+            })
         });
         it('405: invalid methods', () => {
           const invalidMethods = ['patch', 'put', 'delete'];
