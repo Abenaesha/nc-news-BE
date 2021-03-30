@@ -49,16 +49,6 @@ describe('ALL endPoints - /api', () => {
       });
     });
   });
-  // describe("/api", () => {
-  //   it('200: GET - responds with JSON object with all the available routes', () => {
-  //     return request(app)
-  //       .get('/api')
-  //       .expect(200)
-  //       .then(({ body }) => {
-  //         expect(Object.keys(body))
-  //       });
-  //   });
-  // });
   describe('/topics', () => {
     describe('GET - /topics', () => {
       it('200: GET - returns an array of topic objects', () => {
