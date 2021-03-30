@@ -7,16 +7,58 @@ beforeEach(() => dbConnection.seed.run())
 afterAll(() => dbConnection.destroy());
 
 describe('ALL endPoints - /api', () => {
-  describe("/api", () => {
-    it('200: GET - responds with JSON object with all the available routes', () => {
-      return request(app)
-        .get('/api')
-        .expect(200)
-        .then(({ body }) => {
-          expect(Object.keys(body))
+  describe('/api', () => {
+    describe("GET", () => {
+      it('200: GET - responds with all the existing endpoints of the API', () => {
+        return request(app)
+          .get("/api")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).toMatchObject({
+              endpoints: {
+                'GET - /api': {
+                  description:
+                    'responds with a json object displaying all the existing endpoints of the API server',
+                },
+                'GET - /api/topics': expect.any(Object),
+                'GET - /api/users/:username': expect.any(Object),
+                'GET - /api/articles': expect.any(Object),
+                'GET - /api/articles/:article_id': expect.any(Object),
+                'PATCH - /api/articles/:article_id': expect.any(Object),
+                'GET - /api/articles/:article_id/comments': expect.any(Object),
+                'POST - /api/articles/:article_id/comments': expect.any(Object),
+                'PATCH - /api/comments/comment_id': expect.any(Object),
+                'DELETE - /api/comments/:comment_id': expect.any(Object),
+              },
+            });
+          });
+      });
+    });
+    describe('API - ERROR Handling', () => {
+      it('405: responds with status 405 for invalid methods', () => {
+      const notAllowedMethods = ['post', 'patch', 'put', 'delete'];
+        const methodPromises = notAllowedMethods.map(method => {
+          return request(app)
+          [method]('/api')
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe('Method not allowed!')
+            })
         });
+        return Promise.all(methodPromises);
+      });
     });
   });
+  // describe("/api", () => {
+  //   it('200: GET - responds with JSON object with all the available routes', () => {
+  //     return request(app)
+  //       .get('/api')
+  //       .expect(200)
+  //       .then(({ body }) => {
+  //         expect(Object.keys(body))
+  //       });
+  //   });
+  // });
   describe('/topics', () => {
     describe('GET - /topics', () => {
       it('200: GET - returns an array of topic objects', () => {

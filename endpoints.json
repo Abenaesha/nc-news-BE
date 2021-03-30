@@ -1,17 +1,129 @@
 {
-  "GET /api/topics":"selects all topics",
-  "POST /api/topics": "adds a topic to topics database",
-  "GET /api/users": "selects all users",
-  "POST /api/users": "adds a user to users database",
-  "GET /api/users/:username":"selects a user by its username",
-  "GET /api/articles":"selects all articles / query available",
-  "POST /api/articles":"adds an article to articles database ",
-  "GET /api/articles/:article_id":"selects article by its id",
-  "PATCH /api/articles/:article_id":"updates the votes of article by its id",
-  "DELETE /api/articles/:article_id":"removes article by its id",
-  "GET /api/articles/:article_id/comments":"selects  comments by article id /query available",
-  "POST /api/articles/:article_id/comments":"adds a comment to an article by its id",
-  "DELETE /api/articles/:article_id/comments":"removes a comment from an article by its id",
-  "PATCH /api/comments/:comment_id":"updates the vote count of a comment by id",
-  "DELETE /api/comments/:comment_id":"removes a comment by id"
+  "GET - /api": {
+    "description": "responds with a json object displaying all the existing endpoints of the API server"
+  },
+  "GET - /api/topics": {
+    "description": "responds with an array of all topics",
+    "queries": [],
+    "exampleResponse": {
+      "topics": [{ "slug": "paperLOL", "description": "Fwhat books are made of" }]
+    }
+  },
+  "GET - /api/users/:username": {
+    "description": "responds with an object of a user's details",
+    "queries": [],
+    "exampleResponse": {
+      "user": [
+        {
+          "username": "butter_bridge",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+          "name": "jonny"
+        }
+      ]
+    }
+  },
+  "GET - /api/articles": {
+    "description": "responds with an array of all articles",
+    "queries": ["author", "topic", "sort_by", "order"],
+    "exampleResponse": {
+      "articles": [
+        {
+          "title": "Tasty meals hack",
+          "topic": "cooking",
+          "author": "xDanger",
+          "body": "Carry on reading and you will learn how",
+          "created_at": 1527695953341
+        }
+      ]
+    }
+  },
+  "GET - /api/articles/:article_id": {
+    "description": "responds with an object of article details for specific article_id",
+    "queries": [],
+    "example response": {
+      "article": [
+        {
+          "author": "butter_bridge",
+          "title": "Living in the shadow of a great man",
+          "article_id": 1,
+          "body": "I find this existence challenging",
+          "topic": "mitch",
+          "created_at": "2018-11-15T12:21:54.171Z",
+          "votes": 100,
+          "comment_count": "13"
+        }
+      ]
+    }
+  },
+  "PATCH - /api/articles/:article_id": {
+    "description": "Accepts an object to update an article's votes, sresponds with updated article object",
+    "example request": { "inc_votes": 1 },
+    "example response": {
+      "article": [
+        {
+          "author": "butter_bridge",
+          "title": "Living in the shadow of a great man",
+          "article_id": 1,
+          "body": "I find this existence challenging",
+          "topic": "mitch",
+          "created_at": "2018-11-15T12:21:54.171Z",
+          "votes": 100,
+          "comment_count": "13"
+        }
+      ]
+    }
+  },
+  "GET - /api/articles/:article_id/comments": {
+    "description": "responds with an array of comments posted to an article",
+    "queries": ["sort_by", "order_by"],
+    "example response": {
+      "comments": [
+        {
+          "comment_id": "2",
+          "author": "butter_bridge",
+          "article_id": 1,
+          "votes": 14,
+          "created_at": "2016-11-22T12:36:03.389Z",
+          "body": "Hello from the moon!"
+        }
+      ]
+    }
+  },
+  "POST - /api/articles/:article_id/comments": {
+    "description": "Accepts an object to post a comment to an article and responds with comment data posted",
+    "example request": {
+      "username": "butter_bridge",
+      "body": "life is a cycle"
+    },
+    "example response": {
+      "comment": [
+        {
+          "comment_id": 19,
+          "author": "butter_bridge",
+          "article_id": 1,
+          "votes": 0,
+          "body": "taking measures!"
+        }
+      ]
+    }
+  },
+  "PATCH - /api/comments/comment_id": {
+    "description": "Accepts an object to update a comment's votes and responds with the updated comment",
+    "example request": { "inc_votes": 1 },
+    "example response": {
+      "comment": [
+        {
+          "comment_id": 1,
+          "author": "butter_bridge",
+          "article_id": 9,
+          "votes": 17,
+          "created_at": "2017-11-22T12:36:03.389Z",
+          "body": "Lockdown is easing..."
+        }
+      ]
+    }
+  },
+  "DELETE - /api/comments/:comment_id": {
+    "description": "Deletes the comment, returning no content"
+  }
 }
