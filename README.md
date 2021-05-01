@@ -12,7 +12,7 @@ This API is Reddit replica of a dummy database which serves news articles and co
 
 ## Interating with the API
 
-Requests to the API can be made as endpoints on the URL with an example of a list of all endpoints [https://xeddit.herokuapp.com/api]
+Requests to the API can be made as endpoints on the URL with an example of a list of all endpoints [API server](https://xeddit.herokuapp.com/api)
 
 ## To get started
 
